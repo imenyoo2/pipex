@@ -187,8 +187,8 @@ int main(int argc, char **argv, char **env)
   int file1;
   int file2;
   int *pids;
-  int p1[2];
-  int p2[2];
+//  int p1[2];
+//  int p2[2];
   int input_end;
   int i;
   int *pip_to_use;
@@ -202,19 +202,19 @@ int main(int argc, char **argv, char **env)
   file2 = open(argv[argc - 1], O_WRONLY);
   if (file2 == -1)
     ft_printf_err(1, "couldn't open file %s\n", argv[argc - 1], 1);
-  if (pipe(p1) == -1)
-    ft_printf_err(1, "failed to create pipe\n");
-  if (pipe(p2) == -1)
-    ft_printf_err(1, "failed to create pipe\n");
-  if (dup2(file1, p1[1]) == -1)
-    ft_printf_err(1, "failed to duplicate\n");
-  if (dup2(file2, p2[0]) == -1)
-    ft_printf_err(1, "failed to duplicate\n");
+//  if (pipe(p1) == -1)
+//    ft_printf_err(1, "failed to create pipe\n");
+//  if (pipe(p2) == -1)
+//    ft_printf_err(1, "failed to create pipe\n");
+//  if (dup2(file1, p1[1]) == -1)
+//    ft_printf_err(1, "failed to duplicate\n");
+//  if (dup2(file2, p2[0]) == -1)
+//    ft_printf_err(1, "failed to duplicate\n");
   if (pids = malloc(sizeof(int) * (argc - 3)), pids == NULL)
     ft_printf_err(1, "failed to malloc pids\n");
-  close_fd(file1, 0);
-  close_fd(file2, 0);
-  input_end = p1[0];
+//  close_fd(file1, 0);
+//  close_fd(file2, 0);
+  input_end = file1;
   i = 0;
 
 #ifdef DEBUG
@@ -224,12 +224,12 @@ int main(int argc, char **argv, char **env)
   while (i < argc - 3)
   {
     int tmp[2];
-    if (i == argc - 4)
-    {
-      input_end = p2[0];
-      pip_to_use = p2;
-    }
-    else if (pip_to_use = tmp, pipe(pip_to_use) == -1)
+//    if (i == argc - 4)
+//    {
+//      input_end = p2[0];
+//      pip_to_use = p2;
+//    }
+    if (pip_to_use = tmp, i != argc - 4 && pipe(pip_to_use) == -1)
       ft_printf_err(1, "failed to create pipe\n");
 
     pid = fork();
@@ -247,22 +247,33 @@ int main(int argc, char **argv, char **env)
       LOG(fprintf(stderr, "%d: pip_to_use = %p, p1 = %p, p2 = %p\n", pid, pip_to_use, p1, p2));
 #endif
 
-      if (dup2(input_end, 0) == -1 || dup2(pip_to_use[1], 1) == -1)
-      {
-        free(pids);
-        ft_printf_err(1, "couldn't duplicate\n");
-      }
+      dup2(input_end, 0);
+      if (i == argc - 4)
+        dup2(file2, 1);
+      else
+        dup2(pip_to_use[1], 1);
+//      if ( == -1 ||  == -1)
+//      {
+//        free(pids);
+//        ft_printf_err(1, "couldn't duplicate\n");
+//      }
 
 #ifdef DEBUG
       LOG(fprintf(stderr, "%d: duplication done!\n", pid));
 #endif
 
       close_fd(input_end, 0);
-      close_fd(pip_to_use[1], 0);
-      close_fd(pip_to_use[0], 1);
+      close_fd(file2, 0);
       if (i == 0)
-        close_fd(p1[1], 0);
-//      else if (i == argc - 4)
+        close_fd(file1, 0);
+      if (i != argc - 4)
+      {
+        close_fd(pip_to_use[1], 0);
+        close_fd(pip_to_use[0], 0);
+      }
+//      if (i == 0)
+//        close_fd(p1[1], 0);
+//      else if (i != argc - 4)
 //        close_fd(p2[0], 1);
 
       char **args = ft_split(argv[i + 2], ' ');
@@ -330,7 +341,14 @@ int main(int argc, char **argv, char **env)
 //      close_fd(p2[0], 0);
 //    close_fd(pip_to_use[1], 0);
     //close_fd(input_end, 1);
+    if (i == argc - 4)
+      close_fd(file2, 0);
+    if (i == 0)
+      close_fd(file1, 0);
+    close_fd(input_end, 0);
     input_end = pip_to_use[0];
+    if (i != argc - 4)
+      close_fd(pip_to_use[1], 0);
     pids[i] = pid;
     i++;
   }
