@@ -17,4 +17,16 @@
 #  define LOG(x) fprintf(stderr, KRED); x; fprintf(stderr, KNRM); fflush(stderr)
 # endif
 
+typedef struct files
+{
+  int file1;
+  int file2;
+} files_t;
+
+typedef struct pipe
+{
+  int *pipe_to_use;
+  int input_end;
+} pipe_t;
+
 #endif

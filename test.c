@@ -9,6 +9,19 @@
 #include "pipex.h"
 #include <stdio.h>
 
+void init_state(int argc, char **argv, files_t *files, pipe_t *pipe_holder)
+{
+  if (argc < 3)
+    ft_printf_err(1, "not enough arguments\n", 1);
+  files->file1 = open(argv[1], O_RDONLY);
+  if (files->file1 == -1)
+    ft_printf_err(1, "couldn't open file %s\n", argv[1], 1);
+  files->file2 = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0700);
+  if (files->file2 == -1)
+    ft_printf_err(1, "couldn't open file %s\n", argv[argc - 1], 1);
+  pipe_holder->input_end = files->file1;
+}
+
 void duplicate_streams(int input, int output)
 {
       if (dup2(input, 0) == -1)
@@ -61,6 +74,18 @@ void close_fd(int fd, int debug)
       exit(status);
   }
 }
+
+void close_child_fds(int islastloop, int input_end, int *pip_to_use, int file2)
+{
+  close_fd(input_end, 0);
+  close_fd(file2, 0);
+  if (!islastloop)
+  {
+    close_fd(pip_to_use[1], 0);
+    close_fd(pip_to_use[0], 0);
+  }
+}
+
 
 char *get_path(char *cmd, char **env)
 {
@@ -124,25 +149,15 @@ void wait_for_child(pid_t p)
 
 int main(int argc, char **argv, char **env)
 {
-  int file1;
-  int file2;
-  int *pids;
-  int input_end;
+  files_t files;
   int i;
-  int *pip_to_use;
+  pipe_t pipe_holder;
   int pid;
+  int *pids;
   //atexit(f);
-  if (argc < 3)
-    ft_printf_err(1, "not enough arguments\n", 1);
-  file1 = open(argv[1], O_RDONLY);
-  if (file1 == -1)
-    ft_printf_err(1, "couldn't open file %s\n", argv[1], 1);
-  file2 = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0700);
-  if (file2 == -1)
-    ft_printf_err(1, "couldn't open file %s\n", argv[argc - 1], 1);
+  init_state(argc, argv, &files, &pipe_holder);
   if (pids = malloc(sizeof(int) * (argc - 3)), pids == NULL)
     ft_printf_err(1, "failed to malloc pids\n");
-  input_end = file1;
   i = 0;
 
 #ifdef DEBUG
@@ -152,7 +167,7 @@ int main(int argc, char **argv, char **env)
   while (i < argc - 3)
   {
     int tmp[2];
-    if (pip_to_use = tmp, i != argc - 4 && pipe(pip_to_use) == -1)
+    if (pipe_holder.pipe_to_use = tmp, i != argc - 4 && pipe(pipe_holder.pipe_to_use) == -1)
       ft_printf_err(1, "failed to create pipe\n");
 
     pid = fork();
@@ -166,26 +181,20 @@ int main(int argc, char **argv, char **env)
       // add protection
 
 #ifdef DEBUG
-      LOG(fprintf(stderr, "%d: input_end = %d\n", pid, input_end));
-      LOG(fprintf(stderr, "%d: pip_to_use = %p, p1 = %p, p2 = %p\n", pid, pip_to_use, p1, p2));
+      LOG(fprintf(stderr, "%d: pipe_holder.input_end = %d\n", pid, pipe_holder.input_end));
+      LOG(fprintf(stderr, "%d: pipe_holder.pipe_to_use = %p, p1 = %p, p2 = %p\n", pid, pipe_holder.pipe_to_use, p1, p2));
 #endif
 
       if (i == argc - 4)
-        duplicate_streams(input_end, file2);
+        duplicate_streams(pipe_holder.input_end, files.file2);
       else
-        duplicate_streams(input_end, pip_to_use[1]);
+        duplicate_streams(pipe_holder.input_end, pipe_holder.pipe_to_use[1]);
 
 #ifdef DEBUG
       LOG(fprintf(stderr, "%d: duplication done!\n", pid));
 #endif
 
-      close_fd(input_end, 0);
-      close_fd(file2, 0);
-      if (i != argc - 4)
-      {
-        close_fd(pip_to_use[1], 0);
-        close_fd(pip_to_use[0], 0);
-      }
+      close_child_fds(i == argc - 4, pipe_holder.input_end, pipe_holder.pipe_to_use, files.file2);
 
       char **args = ft_split(argv[i + 2], ' ');
 
@@ -247,11 +256,11 @@ int main(int argc, char **argv, char **env)
       ft_printf_err(1, "failed to fork in loop number %d\n", i);
     }
     if (i == argc - 4)
-      close_fd(file2, 0);
-    close_fd(input_end, 0);
-    input_end = pip_to_use[0];
+      close_fd(files.file2, 0);
+    close_fd(pipe_holder.input_end, 0);
+    pipe_holder.input_end = pipe_holder.pipe_to_use[0];
     if (i != argc - 4)
-      close_fd(pip_to_use[1], 0);
+      close_fd(pipe_holder.pipe_to_use[1], 0);
     pids[i] = pid;
     i++;
   }
