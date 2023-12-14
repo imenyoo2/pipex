@@ -159,49 +159,20 @@ int main(int argc, char **argv, char **env)
   if (pids = malloc(sizeof(int) * (argc - 3)), pids == NULL)
     ft_printf_err(1, "failed to malloc pids\n");
   i = 0;
-
-#ifdef DEBUG
-  LOG(fprintf(stderr, "p1 = [%d, %d], p2 = [%d, %d]\n", p1[0], p1[1], p2[0], p2[1]));
-#endif
-
   while (i < argc - 3)
   {
     int tmp[2];
     if (pipe_holder.pipe_to_use = tmp, i != argc - 4 && pipe(pipe_holder.pipe_to_use) == -1)
       ft_printf_err(1, "failed to create pipe\n");
-
     pid = fork();
-
-#ifdef DEBUG
-    LOG(fprintf(stderr, "%d: forking\n", pid));
-#endif
-
     if (pid == 0)
     {
-      // add protection
-
-#ifdef DEBUG
-      LOG(fprintf(stderr, "%d: pipe_holder.input_end = %d\n", pid, pipe_holder.input_end));
-      LOG(fprintf(stderr, "%d: pipe_holder.pipe_to_use = %p, p1 = %p, p2 = %p\n", pid, pipe_holder.pipe_to_use, p1, p2));
-#endif
-
       if (i == argc - 4)
         duplicate_streams(pipe_holder.input_end, files.file2);
       else
         duplicate_streams(pipe_holder.input_end, pipe_holder.pipe_to_use[1]);
-
-#ifdef DEBUG
-      LOG(fprintf(stderr, "%d: duplication done!\n", pid));
-#endif
-
       close_child_fds(i == argc - 4, pipe_holder.input_end, pipe_holder.pipe_to_use, files.file2);
-
       char **args = ft_split(argv[i + 2], ' ');
-
-#ifdef DEBUG
-      LOG(fprintf(stderr, "%d: args = [%s, %s, %s]\n", pid, args[0], args[1], args[2]));
-#endif
-
       if (!args)
       {
         free(pids);
@@ -226,9 +197,6 @@ int main(int argc, char **argv, char **env)
       }
       else
       {
-#ifdef DEBUG
-      LOG(fprintf(stderr, "%d: searching for path\n", pid));
-#endif
         char *path = get_path(args[0], env);
         if (!path)
         {
@@ -238,9 +206,6 @@ int main(int argc, char **argv, char **env)
         }
         else
         {
-#ifdef DEBUG
-      LOG(fprintf(stderr, "%d: executing cmd = %s\n", pid, path));
-#endif
           execve(path, args, env);
           perror("execve");
           free(pids);
