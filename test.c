@@ -9,6 +9,7 @@
 #include "pipex.h"
 #include <stdio.h>
 
+
 void init_state(int argc, char **argv, files_t *files, pipe_t *pipe_holder)
 {
   if (argc < 3)
@@ -86,6 +87,35 @@ void close_child_fds(int islastloop, int input_end, int *pip_to_use, int file2)
   }
 }
 
+void close_parent_fds(int islastloop, pipe_t *pipe_holder, files_t *files)
+{
+  if (islastloop)
+    close_fd(files->file2, 0);
+  close_fd(pipe_holder->input_end, 0);
+  pipe_holder->input_end = pipe_holder->pipe_to_use[0];
+  if (!islastloop)
+    close_fd(pipe_holder->pipe_to_use[1], 0);
+}
+
+// TODO: don't exit if a child fails
+void wait_for_childern(int *children, int count)
+{
+  int i;
+  int status;
+
+  i = 0;
+  while (i < count)
+  {
+    waitpid(children[i], &status, WUNTRACED);
+    if (status != 0)
+    {
+      write(2, "a child process has failed\n", 27);
+      exit(1);
+    }
+    i++;
+  }
+}
+
 
 char *get_path(char *cmd, char **env)
 {
@@ -147,72 +177,68 @@ void wait_for_child(pid_t p)
 //  system("leaks a.out");
 //}
 
-int main(int argc, char **argv, char **env)
+void exec_cmd(char *cmd, char **args, char **env, int *pids)
 {
-  files_t files;
-  int i;
-  pipe_t pipe_holder;
-  int pid;
-  int *pids;
-  //atexit(f);
-  init_state(argc, argv, &files, &pipe_holder);
-  if (pids = malloc(sizeof(int) * (argc - 3)), pids == NULL)
-    ft_printf_err(1, "failed to malloc pids\n");
-  i = 0;
-  while (i < argc - 3)
+  execve(cmd, args, env);
+  perror("execve");
+  free(pids);
+  free_array((void **) args);
+  exit(1);
+}
+
+// TODO: change to use perror
+void cmd_not_found(char *cmd, int *pids, char **args)
+{
+  free(pids);
+  free_array((void **) args);
+  ft_printf_err(1, "%s not found!\n", cmd);
+}
+
+void parse_and_execute_cmd(char *cmd, int *pids, char **env)
+{
+  char **args = ft_split(cmd, ' ');
+  if (!args)
   {
-    int tmp[2];
-    if (pipe_holder.pipe_to_use = tmp, i != argc - 4 && pipe(pipe_holder.pipe_to_use) == -1)
+    free(pids);
+    ft_printf_err(1, "failed to split cmd='%s'\n", args[0]);
+  }
+  if (is_path(args[0]))
+  {
+    if (!access(args[0], X_OK))
+      exec_cmd(args[0], args, env, pids);
+    else
+      cmd_not_found(args[0], pids, args);
+  }
+  else
+  {
+    char *path = get_path(args[0], env);
+    if (!path)
+      cmd_not_found(args[0], pids, args);
+    else
+      exec_cmd(path, args, env, pids);
+  }
+}
+
+void spawn_children(app_args *args, pipe_t *pipe_holder, int *pids, files_t *files)
+{
+  int i;
+  int tmp[2];
+  int pid;
+
+  i = 0;
+  while (i < args->argc - 3)
+  {
+    if (pipe_holder->pipe_to_use = tmp, i != args->argc - 3 - 1 && pipe(pipe_holder->pipe_to_use) == -1)
       ft_printf_err(1, "failed to create pipe\n");
     pid = fork();
     if (pid == 0)
     {
-      if (i == argc - 4)
-        duplicate_streams(pipe_holder.input_end, files.file2);
+      if (i == args->argc - 3 - 1)
+        duplicate_streams(pipe_holder->input_end, files->file2);
       else
-        duplicate_streams(pipe_holder.input_end, pipe_holder.pipe_to_use[1]);
-      close_child_fds(i == argc - 4, pipe_holder.input_end, pipe_holder.pipe_to_use, files.file2);
-      char **args = ft_split(argv[i + 2], ' ');
-      if (!args)
-      {
-        free(pids);
-        ft_printf_err(1, "failed to split cmd='%s'\n", args[0]);
-      }
-      if (is_path(args[0]))
-      {
-        if (!access(args[0], X_OK))
-        {
-          execve(args[0], args, env);
-          perror("execve");
-          free(pids);
-          free_array((void **) args);
-          exit(1);
-        }
-        else
-        {
-          free(pids);
-          free_array((void **) args);
-          ft_printf_err(1, "%s not found!\n", args[0]);
-        }
-      }
-      else
-      {
-        char *path = get_path(args[0], env);
-        if (!path)
-        {
-          free(pids);
-          free_array((void **) args);
-          ft_printf_err(1, "%s not found!\n", args[0]);
-        }
-        else
-        {
-          execve(path, args, env);
-          perror("execve");
-          free(pids);
-          free_array((void **) args);
-          exit(1);
-        }
-      }
+        duplicate_streams(pipe_holder->input_end, pipe_holder->pipe_to_use[1]);
+      close_child_fds(i == args->argc - 3 - 1, pipe_holder->input_end, pipe_holder->pipe_to_use, files->file2);
+      parse_and_execute_cmd(args->argv[i + 2], pids, args->env);
     }
     else if (pid == -1)
     {
@@ -220,27 +246,28 @@ int main(int argc, char **argv, char **env)
       free(pids);
       ft_printf_err(1, "failed to fork in loop number %d\n", i);
     }
-    if (i == argc - 4)
-      close_fd(files.file2, 0);
-    close_fd(pipe_holder.input_end, 0);
-    pipe_holder.input_end = pipe_holder.pipe_to_use[0];
-    if (i != argc - 4)
-      close_fd(pipe_holder.pipe_to_use[1], 0);
+    close_parent_fds(i == args->argc - 3 - 1, pipe_holder, files);
     pids[i] = pid;
     i++;
   }
+}
+
+int main(int argc, char **argv, char **env)
+{
+  files_t files;
+  pipe_t pipe_holder;
+  int *pids;
+  app_args args;
+  //atexit(f);
+
+  args.argv = argv;
+  args.argc = argc;
+  args.env = env;
+  init_state(argc, argv, &files, &pipe_holder);
+  if (pids = malloc(sizeof(int) * (argc - 3)), pids == NULL)
+    ft_printf_err(1, "failed to malloc pids\n");
+  spawn_children(&args, &pipe_holder, pids, &files);
   //waiting loop:
-  i = 0;
-  while (i < argc - 3)
-  {
-    int status;
-    waitpid(pids[i], &status, WUNTRACED);
-    if (status != 0)
-    {
-      write(2, "a child process has failed\n", 27);
-      exit(1);
-    }
-    i++;
-  }
+  wait_for_childern(pids, argc - 3);
   return (0);
 }

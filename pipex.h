@@ -29,4 +29,11 @@ typedef struct pipe
   int input_end;
 } pipe_t;
 
+typedef struct app_args
+{
+  int argc;
+  char **argv;
+  char **env;
+} app_args;
+
 #endif
