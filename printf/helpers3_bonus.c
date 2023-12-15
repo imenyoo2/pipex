@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers3.c                                         :+:      :+:    :+:   */
+/*   helpers3_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:16:45 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/11/20 17:50:05 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:09:42 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	print_nchar(char c, int n, t_format *format)
 		if (c == '0' && !(format->flags & 4)
 			&& format->flags & 1 && (i + format->printed >= format->justify))
 			break ;
-		safe_write(1, &c, 1);
+		safe_write(&c, 1);
 		i++;
 	}
 	if (c == '0')
@@ -38,7 +38,7 @@ void	put_char(char c, int n)
 	i = 0;
 	while (i < n)
 	{
-		safe_write(1, &c, 1);
+		safe_write(&c, 1);
 		i++;
 	}
 }
@@ -48,15 +48,15 @@ void	print_sign(int n, t_format *format)
 {
 	if (n < 0)
 	{
-		safe_write(1, "-", 1);
+		safe_write("-", 1);
 	}
 	else if (format->flags & PLUS)
 	{
-		safe_write(1, "+", 1);
+		safe_write("+", 1);
 	}
 	else if (format->flags & SPACE)
 	{
-		safe_write(1, " ", 1);
+		safe_write(" ", 1);
 	}
 }
 
@@ -74,7 +74,7 @@ int	print_the_wierd_stuff(t_format *format)
 	{
 		if (format->conversion && format->flags & MINUS)
 		{
-			safe_write(1, &format->conversion, 1);
+			safe_write(&format->conversion, 1);
 			format->printed += 1;
 			i = 1;
 		}

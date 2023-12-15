@@ -6,13 +6,13 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 20:50:51 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/11 22:34:49 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:13:16 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	ft_printf_err(int status, const char *format, ...)
+int	ft_printf_err(const char *format, ...)
 {
 	va_list	ptr;
 	size_t	i;
@@ -26,17 +26,17 @@ int	ft_printf_err(int status, const char *format, ...)
 		if (format[i] == '%')
 		{
 			i += ft_convert(&format[i + 1], &byte_counter, ptr);
-			if (safe_write(1, "", 0))
-				exit(status);
+			if (safe_write("", 0))
+        return (-1);
 		}
 		else
 		{
-			if (safe_write(1, &format[i], 1))
-        exit(status);
+			if (safe_write(&format[i], 1))
+        return (-1);
 			byte_counter++;
 		}
 		i++;
 	}
 	va_end(ptr);
-  exit(status);
+  return (byte_counter);
 }

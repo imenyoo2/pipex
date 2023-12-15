@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/05 18:32:46 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/11/20 16:13:38 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:09:13 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_putsnbr_base(ssize_t nbr, const char *base)
 	if (nbr < 0)
 	{
 		if (nbr > (-1 * base_len))
-			safe_write(1, &base[nbr * -1], 1);
+			safe_write(&base[nbr * -1], 1);
 		else
 		{
 			ft_putnbr_base(nbr / (base_len * -1), base);
@@ -30,7 +30,7 @@ void	ft_putsnbr_base(ssize_t nbr, const char *base)
 		}
 	}
 	else if (nbr < base_len)
-		safe_write(1, &base[nbr], 1);
+		safe_write(&base[nbr], 1);
 	else
 	{
 		ft_putnbr_base(nbr / base_len, base);
@@ -46,7 +46,7 @@ void	ft_putnbr_base(size_t nbr, const char *base)
 	while (base[base_len])
 		base_len++;
 	if (nbr < base_len)
-		safe_write(1, &base[nbr], 1);
+		safe_write(&base[nbr], 1);
 	else
 	{
 		ft_putnbr_base(nbr / base_len, base);

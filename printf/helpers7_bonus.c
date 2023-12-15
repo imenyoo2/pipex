@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 17:33:10 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/11 22:30:53 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:10:31 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,10 @@ void	manage_flags_hex(t_format *format, unsigned int nb)
 		format->printed += 2;
 }
 
-int	safe_write(int fd, const char *ptr, int n)
+int	safe_write(const char *ptr, int n)
 {
 	static int	stop_signal = 0;
 
-  (void) fd;
 	if (!stop_signal && n)
 	{
 		if (write(2, ptr, n) == -1)

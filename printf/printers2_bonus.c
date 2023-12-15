@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   printers2.c                                        :+:      :+:    :+:   */
+/*   printers2_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 17:43:43 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/11/20 17:50:50 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:11:10 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	print_hex(t_format *format, va_list ptr)
 	manage_flags_hex(format, holder);
 	pad_left_hex(format, INT, holder);
 	if (format->flags & HASHTAG && holder)
-		safe_write(1, "0x", 2);
+		safe_write("0x", 2);
 	pad_zero_hex(format, holder);
 	if (!(format->flags & DOT && !format->dot && !holder))
 		ft_putnbr_base((size_t) holder, base);
@@ -63,7 +63,7 @@ void	print_uhex(t_format *format, va_list ptr)
 	manage_flags_hex(format, holder);
 	pad_left_hex(format, INT, holder);
 	if (format->flags & HASHTAG && holder)
-		safe_write(1, "0X", 2);
+		safe_write("0X", 2);
 	pad_zero_hex(format, holder);
 	if (!(format->flags & DOT && !format->dot && !holder))
 		ft_putnbr_base((size_t) holder, base);
@@ -78,7 +78,7 @@ void	print_persent(t_format *format, va_list ptr)
 	format->printed += 1;
 	pad_left(format, STRING);
 	pad_zero_string(format);
-	safe_write(1, "%", 1);
+	safe_write("%", 1);
 	pad_right(format, STRING);
 	format->printed += format->spaces;
 }

@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/06 13:45:49 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/12 18:50:22 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:11:53 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ typedef struct format
 	size_t			current_order;
 }					t_format;
 
-int					ft_printf_err(int status, const char *format, ...);
+int					ft_printf_err(const char *format, ...);
 
 void				set_conversions(const char *str, t_format *format);
 size_t				ft_convert(const char *str, size_t *byt_counter,
@@ -111,7 +111,7 @@ void				manage_flags_hex(t_format *format, unsigned int nb);
 void				pad_left_hex(t_format *format, t_type type,
 						unsigned int nb);
 void				manage_flags_string(t_format *format);
-int					safe_write(int fd, const char *ptr, int n);
+int					safe_write(const char *ptr, int n);
 void				pad_zero_ptr(t_format *format);
 void				pad_left_ptr(t_format *format, t_type type);
 void				manage_flags_char(t_format *format);

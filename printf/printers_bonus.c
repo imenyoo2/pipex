@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   printers.c                                         :+:      :+:    :+:   */
+/*   printers_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/05 18:33:54 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/11/20 17:44:11 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:11:26 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	print_char(t_format *format, va_list ptr)
 	format->printed++;
 	pad_left(format, STRING);
 	pad_zero_string(format);
-	safe_write(1, &holder, 1);
+	safe_write(&holder, 1);
 	pad_right(format, INT);
 	format->printed += format->spaces;
 }
@@ -36,7 +36,7 @@ static void	handle_null_string(t_format *format)
 	format->printed += len;
 	pad_left(format, STRING);
 	pad_zero_string(format);
-	safe_write(1, "(null)", len);
+	safe_write("(null)", len);
 	pad_right(format, STRING);
 	format->printed += format->spaces;
 }
@@ -76,7 +76,7 @@ void	print_pointer(t_format *format, va_list ptr)
 			(unsigned int)ft_strlen(base), format);
 	format->printed += 2;
 	pad_left_ptr(format, INT);
-	safe_write(1, "0x", 2);
+	safe_write("0x", 2);
 	pad_zero_ptr(format);
 	if (!(format->flags & DOT && !format->dot && !holder))
 		ft_putnbr_base((size_t) holder, base);
