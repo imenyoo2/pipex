@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 17:40:48 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/11/22 17:40:51 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/15 22:29:32 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,6 @@ typedef enum mode
 	BUFFER = 1 << 1,
 	LINE = 1 << 2
 }				t_mode;
-
-typedef struct list
-{
-	char		*content;
-	struct list	*next;
-}				t_list;
 
 typedef struct state
 {

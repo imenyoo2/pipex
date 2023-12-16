@@ -1,17 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/16 14:03:11 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/16 14:39:51 by ayait-el         ###   ########.fr       */
+/*   Created: 2023/12/15 23:25:33 by ayait-el          #+#    #+#             */
+/*   Updated: 2023/12/16 16:17:16 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+
+#ifndef PIPEX_BONUS_H
+#define PIPEX_BONUS_H
 
 // TODO: make sure you didn't include something you shouldn't
 # include "./get_next_line/get_next_line.h"
@@ -100,5 +101,12 @@ void		fork_failure(int *pids, int fork_num);
 
 void		spawn_child(app_args *args, pipe_t *pipe_holder, files_t *files,
 				int loop);
+
+// bonus
+int is_herdoc(char **argv);
+void write_herdoc_msg(int argc, char *line_to_free);
+char *read_line();
+void write_line(int fd, char *line);
+int get_heredoc_input(int *pids, app_args *args);
 
 #endif
