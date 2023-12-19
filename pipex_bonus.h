@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 23:25:33 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/16 16:17:16 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/19 19:43:38 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void		open_files(int argc, char **argv, files_t *files,
 void		duplicate_streams(int input, int output);
 void		free_array(void **arr);
 void		duplicate_fds(int fd_in, int fd_out);
-void		close_fd(int fd, int debug);
+void		close_fd(int fd);
 
 // helpers2
 void		close_child_fds(int islastloop, int input_end, int *pip_to_use,
@@ -97,7 +97,7 @@ void		wait_for_childern(int *children, int count);
 void		strjoin_failure(char *first_arg, char *second_arg);
 void		check_cmd(char *cmd, int *pids, char **args);
 void		cmd_not_found(char *cmd, int *pids, char **args);
-void		fork_failure(int *pids, int fork_num);
+void	fork_failure(int *pids, int fork_num);
 
 void		spawn_child(app_args *args, pipe_t *pipe_holder, files_t *files,
 				int loop);

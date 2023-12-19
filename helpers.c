@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:02:34 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/15 23:45:56 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/19 19:43:59 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void	duplicate_streams(int input, int output)
 	if (dup2(input, 0) == -1)
 		(ft_printf_err("duplicating input = %d has failed\n", input), exit(1));
 	if (dup2(output, 1) == -1)
-		(ft_printf_err("duplicating output = %d has failed\n", output), exit(1));
+		(ft_printf_err("duplicating output = %d has failed\n", output),
+			exit(1));
 }
 
 void	free_array(void **arr)
@@ -47,44 +48,40 @@ void	duplicate_fds(int fd_in, int fd_out)
 	}
 }
 
-void	close_fd(int fd, int debug)
+void	close_fd(int fd)
 {
 	int	status;
 
 	status = close(fd);
 	if (status == -1)
 	{
-		// TODO: CHANGE THIS
-		perror("closing error");
-		if (debug)
-			ft_printf_err("closing fd = %d\n", fd);
-    exit(status);
+    ft_printf_err("closing fd = %d: %s\n", fd, strerror(errno));
+		exit(status);
 	}
 }
 
 void	close_child_fds(int islastloop, int input_end, int *pip_to_use,
 		int file2)
 {
-	close_fd(input_end, 0);
-	close_fd(file2, 0);
+	close_fd(input_end);
+	close_fd(file2);
 	if (!islastloop)
 	{
-		close_fd(pip_to_use[1], 0);
-		close_fd(pip_to_use[0], 0);
+		close_fd(pip_to_use[1]);
+		close_fd(pip_to_use[0]);
 	}
 }
 
 void	close_parent_fds(int islastloop, pipe_t *pipe_holder, files_t *files)
 {
 	if (islastloop)
-		close_fd(files->file2, 0);
-	close_fd(pipe_holder->input_end, 0);
+		close_fd(files->file2);
+	close_fd(pipe_holder->input_end);
 	pipe_holder->input_end = pipe_holder->pipe_to_use[0];
 	if (!islastloop)
-		close_fd(pipe_holder->pipe_to_use[1], 0);
+		close_fd(pipe_holder->pipe_to_use[1]);
 }
 
-// TODO: don't exit if a child fails
 void	wait_for_childern(int *children, int count)
 {
 	int	i;
@@ -94,11 +91,6 @@ void	wait_for_childern(int *children, int count)
 	while (i < count)
 	{
 		waitpid(children[i], &status, WUNTRACED);
-//		if (status != 0)
-//		{
-//      ft_printf_err("the %dth child has failed with status: %d\n", i, status);
-//			exit(1);
-//		}
 		i++;
 	}
 }
@@ -130,7 +122,7 @@ char	*get_path(char *cmd, char **env)
 
 	cmd = ft_strjoin("/", cmd);
 	if (cmd == NULL)
-    strjoin_failure("/", cmd);
+		strjoin_failure("/", cmd);
 	paths = get_path_env(env);
 	if (!paths)
 		return (free(cmd), NULL);
@@ -139,10 +131,10 @@ char	*get_path(char *cmd, char **env)
 	{
 		path = ft_strjoin(paths[i], cmd);
 		if (path == NULL)
-    {
-      (free(cmd), free_array((void **) paths));
+		{
+			(free(cmd), free_array((void **)paths));
 			strjoin_failure(paths[i], cmd);
-    }
+		}
 		if (!access(path, X_OK))
 			return (free_array((void **)paths), free(cmd), path);
 		free(path);
@@ -188,7 +180,6 @@ void	exec_cmd(char *cmd, char **args, char **env, int *pids)
 	exit(1);
 }
 
-
 void	parse_and_execute_cmd(char *cmd, int *pids, char **env)
 {
 	char	**args;
@@ -202,8 +193,8 @@ void	parse_and_execute_cmd(char *cmd, int *pids, char **env)
 	}
 	if (is_path(args[0]))
 	{
-    check_cmd(args[0], pids, args);
-    exec_cmd(args[0], args, env, pids);
+		check_cmd(args[0], pids, args);
+		exec_cmd(args[0], args, env, pids);
 	}
 	else
 	{
@@ -211,10 +202,10 @@ void	parse_and_execute_cmd(char *cmd, int *pids, char **env)
 		if (!path)
 			cmd_not_found(args[0], pids, args);
 		else
-    {
-      check_cmd(path, pids, args);
+		{
+			check_cmd(path, pids, args);
 			exec_cmd(path, args, env, pids);
-    }
+		}
 	}
 }
 

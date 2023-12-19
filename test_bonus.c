@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 10:29:57 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/16 16:15:44 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/16 21:36:17 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,19 @@
 
 void	open_files(int argc, char **argv, files_t *files, pipe_t *pipe_holder)
 {
-  if (access(argv[1], R_OK) == -1 && !is_herdoc(argv))
-    (ft_printf_err("%s: %s\n", argv[1], strerror(errno)), exit(1));
-  if (access(argv[argc - 1], W_OK) == -1)
-    (ft_printf_err("%s: %s\n", argv[argc - 1], strerror(errno)), exit(1));
+//  if (access(argv[1], R_OK) == -1 && !is_herdoc(argv))
+//    (ft_printf_err("%s: %s\n", argv[1], strerror(errno)), exit(1));
+//  if (access(argv[argc - 1], W_OK) == -1)
+//    (ft_printf_err("%s: %s\n", argv[argc - 1], strerror(errno)), exit(1));
   if (!is_herdoc(argv))
   {
     files->file1 = open(argv[1], O_RDONLY);
     if (files->file1 == -1)
-      (ft_printf_err("couldn't open file %s\n", argv[1]), exit(1));
+      (ft_printf_err("%s: %s\n", argv[1], strerror(errno)), exit(1));
   }
-	files->file2 = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0700);
+	files->file2 = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT | (O_APPEND * is_herdoc(argv)), 0644);
 	if (files->file2 == -1)
-		(ft_printf_err("couldn't open file %s\n", argv[argc - 1]), exit(1));
+		(ft_printf_err("%s: %s\n", argv[argc - 1], strerror(errno)), exit(1));
 }
 
 void usage()

@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:02:34 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/16 17:48:38 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/19 19:43:27 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,17 +47,14 @@ void	duplicate_fds(int fd_in, int fd_out)
 	}
 }
 
-void	close_fd(int fd, int debug)
+void	close_fd(int fd)
 {
 	int	status;
 
 	status = close(fd);
 	if (status == -1)
 	{
-		// TODO: CHANGE THIS
-		perror("closing error");
-		if (debug)
-			ft_printf_err("closing fd = %d\n", fd);
+    ft_printf_err("closing fd = %d: %s\n", fd, strerror(errno));
     exit(status);
 	}
 }
@@ -65,23 +62,23 @@ void	close_fd(int fd, int debug)
 void	close_child_fds(int islastloop, int input_end, int *pip_to_use,
 		int file2)
 {
-	close_fd(input_end, 0);
-	close_fd(file2, 0);
+	close_fd(input_end);
+	close_fd(file2);
 	if (!islastloop)
 	{
-		close_fd(pip_to_use[1], 0);
-		close_fd(pip_to_use[0], 0);
+		close_fd(pip_to_use[1]);
+		close_fd(pip_to_use[0]);
 	}
 }
 
 void	close_parent_fds(int islastloop, pipe_t *pipe_holder, files_t *files)
 {
 	if (islastloop)
-		close_fd(files->file2, 0);
-	close_fd(pipe_holder->input_end, 0);
+		close_fd(files->file2);
+	close_fd(pipe_holder->input_end);
 	pipe_holder->input_end = pipe_holder->pipe_to_use[0];
 	if (!islastloop)
-		close_fd(pipe_holder->pipe_to_use[1], 0);
+		close_fd(pipe_holder->pipe_to_use[1]);
 }
 
 // TODO: don't exit if a child fails
@@ -359,8 +356,8 @@ int get_heredoc_input(int *pids, app_args *args)
       line = read_line();
     }
     free(line);
-    close_fd(herdoc_pipe[0], 0);
-    close_fd(herdoc_pipe[1], 0);
+    close_fd(herdoc_pipe[0]);
+    close_fd(herdoc_pipe[1]);
     exit(0);
   }
   else if (pid == -1)
@@ -368,7 +365,7 @@ int get_heredoc_input(int *pids, app_args *args)
   else
   {
     pids[0] = pid;
-    close_fd(herdoc_pipe[1], 0);
+    close_fd(herdoc_pipe[1]);
   }
   return (herdoc_pipe[0]);
 }
