@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 14:03:11 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/19 19:43:46 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/20 10:54:20 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <string.h>
 # include <sys/types.h>
 # include <unistd.h>
+# include <sys/wait.h>
 
 /*
 # ifdef DEBUG
