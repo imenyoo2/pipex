@@ -6,7 +6,7 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 10:29:57 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/19 19:27:25 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/20 10:49:28 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,11 @@ void usage()
   ft_printf_err("Usage:\n\t./pipex input_file cmd1 cmd2 output_file\n");
 }
 
+ void  f()
+{
+  system("leaks pipex");
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	files_t		files;
@@ -38,7 +43,7 @@ int	main(int argc, char **argv, char **env)
 	int			*pids;
 	app_args	args;
 
-	// atexit(f);
+	atexit(f);
 	args.argv = argv;
 	args.argc = argc;
 	args.env = env;

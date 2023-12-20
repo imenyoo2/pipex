@@ -6,11 +6,42 @@
 /*   By: ayait-el <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/15 15:02:34 by ayait-el          #+#    #+#             */
-/*   Updated: 2023/12/19 19:43:59 by ayait-el         ###   ########.fr       */
+/*   Updated: 2023/12/20 10:50:08 by ayait-el         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+/*
+void arr_swap(char **a, char **b)
+{
+  char *c;
+
+  c = *a;
+  *a = *b;
+  *b = c;
+}
+
+void handle_quotes(char **arr)
+{
+  char **new;
+  char *holder;
+
+  new = "";
+  i = 0;
+  while (arr[i])
+  {
+    if (arr[i][0] == '"')
+    {
+      while (arr[i][ft_strlen(arr[i]) - 1] != '"')
+      {
+        i++;
+      }
+    }
+    i++;
+  }
+}
+*/
 
 void	duplicate_streams(int input, int output)
 {
@@ -166,10 +197,6 @@ void	wait_for_child(pid_t p)
 	}
 }
 
-// void  f()
-//{
-//  system("leaks a.out");
-//}
 
 void	exec_cmd(char *cmd, char **args, char **env, int *pids)
 {
@@ -249,7 +276,6 @@ void	spawn_children(app_args *args, pipe_t *pipe_holder, int *pids,
 			spawn_child(args, pipe_holder, files, i);
 			parse_and_execute_cmd(args->argv[i + 2], pids, args->env);
 		}
-		// TODO: maybe close open pids here;
 		else if (pid == -1)
 			fork_failure(pids, i);
 		close_parent_fds(i == args->argc - 3 - 1, pipe_holder, files);
